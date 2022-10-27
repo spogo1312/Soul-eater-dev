@@ -7,6 +7,7 @@
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 83, 155 )
+max_fall_speed_wall_slide = 500
 
 [node name="StaticBody2D2" parent="." instance=ExtResource( 1 )]
 position = Vector2( 475, 40 )
