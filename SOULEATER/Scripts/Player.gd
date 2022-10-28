@@ -90,15 +90,7 @@ func check_ground_wall_logic():
 		can_wall_jump = true
 	#get info about coliding on the top so player can stgand
 	can_not_stand = stand_ray.is_colliding()
-	if(can_not_stand):
-		is_jumping = false
-		can_double_jump = false
-		can_wall_jump = false
-	#check when we are able to stand again
-	if(!can_not_stand):
-		is_jumping = false
-		can_double_jump = true
-		can_wall_jump = true
+
 	#lock of wall sliding here
 	if(is_on_wall() and !touching_ground and vSpeed > 0):
 		if((Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right")) or 
@@ -127,7 +119,10 @@ func handle_jumping(var delta):
 			is_jumping = true
 			touching_ground = false
 			
+		
+		
 	else: # we're in the air
+		
 		#Do variable jump logic
 		if(vSpeed < 0 and !Input.is_action_pressed("jump") and !is_double_jumping):
 			vSpeed = max(vSpeed,jump_height / 2)
@@ -195,6 +190,13 @@ func handle_movement(var delta):
 					ani.play("SLIDE") 
 				else:
 					ani.play("RUN")
+		else:
+			if(touching_ground or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
+			
 	elif((Input.get_joy_axis(0,0) < -0.3 or Input.is_action_pressed("ui_left")) and !is_sliding):
 		if(hSpeed > 100):
 			hSpeed -= (deacceleration * delta)

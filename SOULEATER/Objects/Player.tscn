@@ -79,6 +79,7 @@ script = ExtResource( 18 )
 position = Vector2( 0, 18 )
 frames = SubResource( 1 )
 animation = "SLIDE"
+frame = 1
 playing = true
 offset = Vector2( 0, -18 )
 
@@ -120,4 +121,5 @@ collision_mask = 4
 
 [node name="Camera2D" type="Camera2D" parent="."]
 current = true
-zoom = Vector2( 1.5, 1.5 )
+smoothing_enabled = true
+smoothing_speed = 13.0
