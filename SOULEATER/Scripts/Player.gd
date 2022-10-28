@@ -32,6 +32,7 @@ var air_jump_pressed : bool = false
 var coyote_time : bool = false #check if we can jump JUST after we leave platform 0.2 seconds after just left platform can jump normally
 var can_double_jump : bool = false 
 var can_wall_jump : bool = false 
+var can_not_stand : bool = false 
 
 var motion = Vector2.ZERO
 var UP : Vector2 = Vector2(0,-1)
@@ -41,6 +42,7 @@ onready var ani = $AnimatedSprite
 onready var ground_ray = $raycast_container/ray_ground
 onready var right_ray = $raycast_container/right_ray
 onready var left_ray = $raycast_container/left_ray
+onready var stand_ray = $raycast_container/ray_stand
 
 onready var stand_shape = $stand_shape
 onready var slide_shape = $slide_shape
@@ -86,6 +88,17 @@ func check_ground_wall_logic():
 		motion.y = 0
 		vSpeed = 0
 		can_wall_jump = true
+	#get info about coliding on the top so player can stgand
+	can_not_stand = stand_ray.is_colliding()
+	if(can_not_stand):
+		is_jumping = false
+		can_double_jump = false
+		can_wall_jump = false
+	#check when we are able to stand again
+	if(!can_not_stand):
+		is_jumping = false
+		can_double_jump = true
+		can_wall_jump = true
 	#lock of wall sliding here
 	if(is_on_wall() and !touching_ground and vSpeed > 0):
 		if((Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right")) or 
@@ -126,6 +139,7 @@ func handle_jumping(var delta):
 		#Do some animation logic on the jump
 		if(!is_double_jumping and vSpeed <0):
 			ani.play("JUMPUP")
+		
 		elif(!is_double_jumping and vSpeed > 0):
 			ani.play("JUMPDOWN")
 		elif(is_double_jumping and ani.frame == 3):
@@ -163,37 +177,59 @@ func handle_movement(var delta):
 	if((Input.get_joy_axis(0,0) > 0.3 or Input.is_action_pressed("ui_right")) and !is_sliding):
 		if(hSpeed <-100):
 			hSpeed += (deacceleration * delta)
-			if(touching_ground):
-				ani.play("TURN")
+			if(touching_ground or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
 		elif(hSpeed < max_horizontal_speed):
 			hSpeed += (acceleration * delta)
 			ani.flip_h = false
-			if(touching_ground):
-				ani.play("RUN")
-		else:
-			if(touching_ground):
-				ani.play("RUN")
+			if(touching_ground or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
+			if(touching_ground or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
 	elif((Input.get_joy_axis(0,0) < -0.3 or Input.is_action_pressed("ui_left")) and !is_sliding):
 		if(hSpeed > 100):
 			hSpeed -= (deacceleration * delta)
-			if(touching_ground):
-				ani.play("TURN")
+			if(touching_ground or can_not_stand):
+			
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
 		elif(hSpeed > -max_horizontal_speed):
 			hSpeed -= (acceleration * delta)
 			ani.flip_h = true
-			if(touching_ground):
-				ani.play("RUN")
+			if(touching_ground or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
 		else:
-			if(touching_ground):
-				ani.play("RUN")
+			if(touching_ground or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("RUN")
 	else:
 		if(touching_ground):
-			if(!is_sliding):
-				ani.play("IDLE")
+			if(!is_sliding or can_not_stand):
+				if can_not_stand:
+					ani.play("SLIDE") 
+				else:
+					ani.play("IDLE")
 			else:
 				if(abs(hSpeed) < 0.2):
 					ani.stop()
 					ani.frame = 1
+		
 		hSpeed -= min(abs(hSpeed),current_friction * delta) * sign(hSpeed)
 	pass
 	
@@ -224,9 +260,17 @@ func handle_player_collision_shapes():
 	if(is_sliding and slide_shape.disabled): # changing collision hitbox if hes sliding
 		stand_shape.disabled = true
 		slide_shape.disabled = false
+		
 	elif(!is_sliding and stand_shape.disabled): # changing collision hitbox if stopped sliding
-		stand_shape.disabled = false
-		slide_shape.disabled = true
+		if(can_not_stand):
+			stand_shape.disabled = true
+			slide_shape.disabled = false
+			
+			
+		else:
+			stand_shape.disabled = false
+			slide_shape.disabled = true
+			
 		# i have no idea what will happen if stop sliding and there is wall above you and you cannot stand up no idea how to handle it for now
 
 func check_sliding_logic():
@@ -249,4 +293,9 @@ func check_sliding_logic():
 	else:
 		current_friction = friction
 		is_sliding = false
+	if(can_not_stand):
+		max_horizontal_speed = 50
+		
+	else:
+		max_horizontal_speed = 400
 		

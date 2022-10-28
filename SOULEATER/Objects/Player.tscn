@@ -78,8 +78,7 @@ script = ExtResource( 18 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 position = Vector2( 0, 18 )
 frames = SubResource( 1 )
-animation = "IDLE"
-frame = 2
+animation = "SLIDE"
 playing = true
 offset = Vector2( 0, -18 )
 
@@ -97,6 +96,12 @@ position = Vector2( 0, 18 )
 
 [node name="ray_ground" type="RayCast2D" parent="raycast_container"]
 position = Vector2( -4, 1 )
+enabled = true
+cast_to = Vector2( 8, 0 )
+collision_mask = 4
+
+[node name="ray_stand" type="RayCast2D" parent="raycast_container"]
+position = Vector2( -5, -21 )
 enabled = true
 cast_to = Vector2( 8, 0 )
 collision_mask = 4
