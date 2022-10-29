@@ -24,6 +24,7 @@ export var wall_jump_push = 500
 var vSpeed = 0
 var hSpeed = 0
 var current_hp = max_hp
+var stun = 0
 
 var is_wall_sliding : bool = false 
 var touching_ground : bool = false 
@@ -94,7 +95,19 @@ func check_ground_wall_logic():
 		can_wall_jump = true
 	#get info about coliding on the top so player can stgand
 	can_not_stand = stand_ray.is_colliding()
-
+	
+	if(stun > 0):
+		hSpeed = 0
+		if(touching_ground):
+			vSpeed = 0
+			can_double_jump = false
+			is_jumping = true
+			ani.play("STUN")
+			can_animate = false
+		stun -= 1
+	else:
+		can_animate = true
+		
 	#lock of wall sliding here
 	if(is_on_wall() and !touching_ground and vSpeed > 0):
 		if((Input.is_action_pressed("ui_left") or Input.is_action_pressed("ui_right")) or 
@@ -143,7 +156,11 @@ func handle_jumping(var delta):
 		
 		elif(!is_double_jumping and vSpeed > 0):
 			if(can_animate):
-				ani.play("JUMPDOWN")
+				if(stun > 0):
+					ani.play("STUN")
+				else:
+					ani.play("JUMPDOWN")
+				
 		elif(is_double_jumping and ani.frame == 3):
 			is_double_jumping = false
 			
@@ -262,12 +279,11 @@ func do_physics(var delta):
 		vSpeed = min(vSpeed,max_fall_speed_wall_slide) # limit for falling while wall sliding
 	#knockback logic
 	if(strenght != 0):
-		touching_ground = false
+		
 		ani.play("HIT")
 		can_animate = false
-		#ani.stop()
-		#else:
-		#	ani.play("HIT")
+		
+		print(touching_ground)
 		
 		if(strenght < 0):
 			if(strenght % 2 == 0):
@@ -358,7 +374,8 @@ func _on_player_hitbox_area_entered(area):
 	strenght = area.strength
 	do_dmg(damage)
 	#knockback(area.strength)
-	
+	if (area.launch_angle != 0):
+		stun = area.launch_angle
 	print(current_hp)
 	pass
 

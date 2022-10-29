@@ -20,18 +20,17 @@ animations = [ {
 position = Vector2( -6, 0 )
 scale = Vector2( 0.5, 1 )
 script = ExtResource( 5 )
+launch_angle = 60
 strength = -200
 damage = 2
-knockback_scale = 1
 
 [node name="Hitbox2" type="Area2D" parent="."]
 position = Vector2( 5, 0 )
 scale = Vector2( 0.5, 1 )
 script = ExtResource( 5 )
-launch_angle = 45
+launch_angle = 60
 strength = 200
 damage = 2
-knockback_scale = 1
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 frames = SubResource( 1 )

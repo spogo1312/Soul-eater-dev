@@ -60,6 +60,11 @@ animations = [ {
 "name": "SLIDE",
 "speed": 5.0
 }, {
+"frames": [ ExtResource( 19 ), ExtResource( 20 ) ],
+"loop": true,
+"name": "STUN",
+"speed": 5.0
+}, {
 "frames": [ ExtResource( 3 ) ],
 "loop": true,
 "name": "TURN",
@@ -86,8 +91,7 @@ script = ExtResource( 18 )
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 position = Vector2( 0, 18 )
 frames = SubResource( 1 )
-animation = "HIT"
-frame = 5
+animation = "STUN"
 playing = true
 offset = Vector2( 0, -18 )
 
