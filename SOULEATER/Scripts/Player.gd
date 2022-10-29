@@ -15,6 +15,7 @@ export var max_fall_speed_wall_slide = 100
 export var wall_slide_gravity = 100
 export var max_hp = 100
 var strenght = 0
+var can_animate = true
 
 export var wall_jump_height = -500
 export var wall_jump_push = 500
@@ -131,15 +132,18 @@ func handle_jumping(var delta):
 			vSpeed = max(vSpeed,jump_height / 2)
 		if(can_double_jump and Input.is_action_just_pressed("jump") and !coyote_time and !touching_wall):
 			vSpeed = double_jump_height
-			ani.play("DOUBLEJUMP")
+			if(can_animate):
+				ani.play("DOUBLEJUMP")
 			is_double_jumping = true
 			can_double_jump = false
 		#Do some animation logic on the jump
 		if(!is_double_jumping and vSpeed <0):
-			ani.play("JUMPUP")
+			if(can_animate):
+				ani.play("JUMPUP")
 		
 		elif(!is_double_jumping and vSpeed > 0):
-			ani.play("JUMPDOWN")
+			if(can_animate):
+				ani.play("JUMPDOWN")
 		elif(is_double_jumping and ani.frame == 3):
 			is_double_jumping = false
 			
@@ -157,7 +161,8 @@ func handle_jumping(var delta):
 			can_wall_jump = false
 			
 		if(is_wall_sliding):
-			ani.play("WALLSLIDE")
+			if(can_animate):
+				ani.play("WALLSLIDE")
 			is_double_jumping = false # so we can double jump after wall jump
 		
 		#check if we're pressing jump just before we land on a platform
@@ -175,65 +180,71 @@ func handle_movement(var delta):
 	if((Input.get_joy_axis(0,0) > 0.3 or Input.is_action_pressed("ui_right")) and !is_sliding):
 		if(hSpeed <-100):
 			hSpeed += (deacceleration * delta)
-			if(touching_ground or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
+			if(can_animate):
+				if(touching_ground or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
 		elif(hSpeed < max_horizontal_speed):
 			hSpeed += (acceleration * delta)
-			ani.flip_h = false
-			if(touching_ground or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
-			if(touching_ground or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
+			if(can_animate):
+				ani.flip_h = false
+				if(touching_ground or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
+				if(touching_ground or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
 		else:
-			if(touching_ground or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
+			if(can_animate):
+				if(touching_ground or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
 			
 	elif((Input.get_joy_axis(0,0) < -0.3 or Input.is_action_pressed("ui_left")) and !is_sliding):
 		if(hSpeed > 100):
 			hSpeed -= (deacceleration * delta)
 			if(touching_ground or can_not_stand):
-			
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
+				if(can_animate):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
 		elif(hSpeed > -max_horizontal_speed):
 			hSpeed -= (acceleration * delta)
-			ani.flip_h = true
-			if(touching_ground or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
+			if(can_animate):
+				ani.flip_h = true
+				if(touching_ground or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
 		else:
-			if(touching_ground or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
-				else:
-					ani.play("RUN")
+			if(can_animate):
+				if(touching_ground or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("RUN")
 	else:
-		if(touching_ground):
-			if(!is_sliding or can_not_stand):
-				if can_not_stand:
-					ani.play("SLIDE") 
+		if(can_animate):
+			if(touching_ground):
+				if(!is_sliding or can_not_stand):
+					if can_not_stand:
+						ani.play("SLIDE") 
+					else:
+						ani.play("IDLE")
 				else:
-					ani.play("IDLE")
-			else:
-				if(abs(hSpeed) < 0.2):
-					ani.stop()
-					ani.frame = 1
+					if(abs(hSpeed) < 0.2):
+						ani.stop()
+						ani.frame = 1
 		
 		hSpeed -= min(abs(hSpeed),current_friction * delta) * sign(hSpeed)
 	pass
@@ -251,10 +262,18 @@ func do_physics(var delta):
 		vSpeed = min(vSpeed,max_fall_speed_wall_slide) # limit for falling while wall sliding
 	#knockback logic
 	if(strenght != 0):
+		touching_ground = false
+		ani.play("HIT")
+		can_animate = false
+		#ani.stop()
+		#else:
+		#	ani.play("HIT")
+		
 		if(strenght < 0):
 			if(strenght % 2 == 0):
 				hSpeed = strenght
 				strenght = strenght + 10
+				
 				
 			else:
 				hSpeed = strenght
@@ -316,11 +335,12 @@ func check_sliding_logic():
 	#do animation and friction logic 
 	if(is_sliding and touching_ground):
 		current_friction = slide_friction # reduce our friction for our slide
-		ani.play("SLIDE")
+		if(can_animate):
+			ani.play("SLIDE")
 	else:
 		current_friction = friction
 		is_sliding = false
-	if(can_not_stand):
+	if(can_not_stand and !Input.is_action_pressed("slide")):
 		max_horizontal_speed = 50
 		
 	else:
@@ -328,6 +348,8 @@ func check_sliding_logic():
 		
 func do_dmg(dmg):
 	current_hp = current_hp - dmg
+	
+	
 func knockback(strenght):
 	global_position.x = (global_position.x + strenght) 
 
@@ -339,3 +361,7 @@ func _on_player_hitbox_area_entered(area):
 	
 	print(current_hp)
 	pass
+
+
+func _on_AnimatedSprite_animation_finished():
+	can_animate = true
