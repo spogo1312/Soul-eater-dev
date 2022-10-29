@@ -13,6 +13,8 @@ export var double_jump_height = -400
 export var slide_friction = 400
 export var max_fall_speed_wall_slide = 100
 export var wall_slide_gravity = 100
+export var max_hp = 100
+var strenght = 0
 
 export var wall_jump_height = -500
 export var wall_jump_push = 500
@@ -20,6 +22,7 @@ export var wall_jump_push = 500
 #variables that changes themselevs thruout the life of an object
 var vSpeed = 0
 var hSpeed = 0
+var current_hp = max_hp
 
 var is_wall_sliding : bool = false 
 var touching_ground : bool = false 
@@ -246,11 +249,33 @@ func do_physics(var delta):
 	else:
 		vSpeed += (wall_slide_gravity * delta)
 		vSpeed = min(vSpeed,max_fall_speed_wall_slide) # limit for falling while wall sliding
-	
+	#knockback logic
+	if(strenght != 0):
+		if(strenght < 0):
+			if(strenght % 2 == 0):
+				hSpeed = strenght
+				strenght = strenght + 10
+				
+			else:
+				hSpeed = strenght
+				strenght += 1
+		elif(strenght > 0):
+			
+			if(strenght % 2 == 0):
+				hSpeed = strenght
+				strenght = strenght - 10
+			else:
+				hSpeed = strenght
+				strenght -= 1
+	#making sure player cannot go faster than max horizontal speed
+	if(hSpeed > 0 and hSpeed > max_horizontal_speed):
+		hSpeed = max_horizontal_speed
+	if(hSpeed < 0 and hSpeed < -max_horizontal_speed):
+		hSpeed = -max_horizontal_speed
 	#update our motion vector
 	motion.y = vSpeed
-	motion.x = hSpeed
-	
+	motion.x = hSpeed 
+	#print(hSpeed) #to see current horizontal speed in console
 	#apply our motion vector to move and slide
 	motion = move_and_slide(motion,UP)
 	
@@ -301,3 +326,16 @@ func check_sliding_logic():
 	else:
 		max_horizontal_speed = 400
 		
+func do_dmg(dmg):
+	current_hp = current_hp - dmg
+func knockback(strenght):
+	global_position.x = (global_position.x + strenght) 
+
+func _on_player_hitbox_area_entered(area):
+	var damage = area.damage
+	strenght = area.strength
+	do_dmg(damage)
+	#knockback(area.strength)
+	
+	print(current_hp)
+	pass
