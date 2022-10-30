@@ -92,6 +92,7 @@ script = ExtResource( 18 )
 position = Vector2( 0, 18 )
 frames = SubResource( 1 )
 animation = "STUN"
+frame = 1
 playing = true
 offset = Vector2( 0, -18 )
 

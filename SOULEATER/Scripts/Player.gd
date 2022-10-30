@@ -17,6 +17,9 @@ export var max_hp = 100
 var strenght = 0
 var can_animate = true
 
+signal dmg
+
+
 export var wall_jump_height = -500
 export var wall_jump_push = 500
 
@@ -39,6 +42,8 @@ var can_double_jump : bool = false
 var can_wall_jump : bool = false 
 var can_not_stand : bool = false 
 
+
+
 var motion = Vector2.ZERO
 var UP : Vector2 = Vector2(0,-1)
 
@@ -53,8 +58,8 @@ onready var stand_shape = $stand_shape
 onready var slide_shape = $slide_shape
 
 func _ready():
-	pass # Replace with function body.
-
+	emit_signal("dmg", current_hp, current_hp)
+	pass
 
 func _physics_process(delta):
 	#check if we're grounded
@@ -363,9 +368,14 @@ func check_sliding_logic():
 		max_horizontal_speed = 400
 		
 func do_dmg(dmg):
+	var old_hp = current_hp
 	current_hp = current_hp - dmg
+	emit_signal("dmg", current_hp, old_hp)
+	if(current_hp <= 0):
+		die()
 	
-	
+func die():
+	queue_free()
 func knockback(strenght):
 	global_position.x = (global_position.x + strenght) 
 
@@ -382,3 +392,6 @@ func _on_player_hitbox_area_entered(area):
 
 func _on_AnimatedSprite_animation_finished():
 	can_animate = true
+
+
+

@@ -1,10 +1,16 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://StaticBody2D.tscn" type="PackedScene" id=1]
 [ext_resource path="res://Objects/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://CanvasLayer.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Enemy2.tscn" type="PackedScene" id=4]
+[ext_resource path="res://UI.tscn" type="PackedScene" id=5]
 
 [node name="main" type="Node2D"]
+
+[node name="CanvasLayer" parent="." groups=["ui"] instance=ExtResource( 3 )]
+
+[node name="Control" parent="CanvasLayer" instance=ExtResource( 5 )]
 
 [node name="Player" parent="." instance=ExtResource( 2 )]
 position = Vector2( 83, 155 )
@@ -55,3 +61,5 @@ position = Vector2( -49, 157 )
 
 [node name="StaticBody2D14" parent="." instance=ExtResource( 1 )]
 position = Vector2( -22, 157 )
+
+[connection signal="dmg" from="Player" to="CanvasLayer/Control" method="_on_Player_dmg"]
