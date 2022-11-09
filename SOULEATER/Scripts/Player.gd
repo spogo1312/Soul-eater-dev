@@ -7,6 +7,8 @@ export var deacceleration = 2000
 export var friction = 2000
 export var current_friction = 2000
 export var max_horizontal_speed = 400
+
+export var def_h_speed = 400
 export var max_fall_speed = 1000
 export var jump_height = -500
 export var double_jump_height = -400
@@ -365,7 +367,7 @@ func check_sliding_logic():
 		max_horizontal_speed = 50
 		
 	else:
-		max_horizontal_speed = 400
+		max_horizontal_speed = def_h_speed
 		
 func do_dmg(dmg):
 	var old_hp = current_hp
