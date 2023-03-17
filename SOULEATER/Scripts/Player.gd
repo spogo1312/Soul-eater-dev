@@ -138,11 +138,13 @@ func handle_jumping(var delta):
 		can_double_jump = true
 	
 	if(touching_ground):
-		if((Input.is_action_just_pressed("jump") or air_jump_pressed) and !is_jumping):
-			vSpeed = jump_height
-			is_jumping = true
-			touching_ground = false
-			
+		if (!can_not_stand):
+			if((Input.is_action_just_pressed("jump") or air_jump_pressed) and !is_jumping):
+				vSpeed = jump_height
+				is_jumping = true
+				touching_ground = false
+		else:
+			pass
 		
 		
 	else: # we're in the air
@@ -229,6 +231,7 @@ func handle_movement(var delta):
 				if(touching_ground or can_not_stand):
 					if can_not_stand:
 						ani.play("SLIDE") 
+						
 					else:
 						ani.play("RUN")
 			
@@ -363,10 +366,21 @@ func check_sliding_logic():
 	else:
 		current_friction = friction
 		is_sliding = false
-	if(can_not_stand and !Input.is_action_pressed("slide")):
-		max_horizontal_speed = 50
+	if(can_not_stand):
+		is_sliding = true
+		#musím vymyslet jak kurva to crouchovaní
+		current_friction = slide_friction
+		#Input.action_press("slide")
+		if(Input.is_action_pressed("ui_a") and hSpeed > -50):
+			hSpeed = -50
+			ani.flip_h = true
+		if(Input.is_action_pressed("ui_d") and hSpeed < 50):
+			hSpeed = 50
+			ani.flip_h = false
+			
 		
 	else:
+		
 		max_horizontal_speed = def_h_speed
 		
 func do_dmg(dmg):
